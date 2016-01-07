@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Raiders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <div id="startMenuWrapper">
+      <div id="startMenu">
+        <p>Raiders</p>
+        <input type="text" tabindex="0" autofocus placeholder="Enter your name here" id="playerNameInput" maxlength="25" />
+        <b class="input-error">Nick must be alphanumeric characters only!</b>
+        <br />
+        <button id="startButton">Play</button>
+      </div>
+    </div>
+    <div id="gameAreaWrapper">
+      <div id="game"></div>
+      <ul id="messages"></ul>
+      <form action="">
+        <input id="m" autocomplete="off" /><button>Send</button>
+      </form>
+    </div>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/lib/jquery.min.js"></script>
+  <script src="js/lib/crafty.js"></script>
+  <script src="js/main.js"></script>
+</html>

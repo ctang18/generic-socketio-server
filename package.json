@@ -1,0 +1,19 @@
+{
+  "name": "unnamed-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server/server.js",
+  "author": "ctang18@gmail.com",
+  "scripts": { 
+    "start": "node server/server.js" 
+  },
+  "dependencies": {
+    "express": "^4.13.3",
+    "mongoose": "^4.3.4",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^3.1.0",
+    "socket.io": "^1.3.7",
+    "socket.io-client": "^1.3.7"
+  }
+}
