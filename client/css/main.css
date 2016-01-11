@@ -21,7 +21,7 @@ div {
     -ms-user-select: none; /* IE10+ */
 }
 
-#startMenu {
+#startMenu, #registerMenu {
     position: relative;
     margin: auto;
     margin-top: 100px;
@@ -34,14 +34,15 @@ div {
     box-sizing: border-box;
 }
 
-#startMenu p {
+#startMenu p, #registerMenu p {
     padding: 0;
     text-align: center;
     font-size: x-large;
     font-weight: bold;
 }
 
-#playerNameInput {
+#playerUsernameInput, #playerPasswordInput,
+#regUsernameInput, #regPasswordInput {
     width: 100%;
     text-align: center;
     padding: 10px;
@@ -55,12 +56,16 @@ div {
     outline: none;
 }
 
-#playerNameInput:focus, #playerNameInput.focus {
+#playerUsernameInput:focus, #playerUsernameInput.focus,
+#playerPasswordInput:focus, #playerPasswordInput.focus,
+#regUsernameInput:focus, #regUsernameInput.focus,
+#regPasswordInput:focus, #regPasswordInput.focus {
     border: solid 1px #CCCCCC;
     box-shadow: 0 0 3px 1px #DDDDDD;
 }
 
-#startButton {
+#startButton, #createAccountButton,
+#registerButton, #cancelRegisterButton {
     position: relative;
     margin: auto;
     margin-top: 10px;
@@ -83,7 +88,10 @@ div {
     margin-bottom: 10px;
 }
 
-#startButton:active, #startButton:hover {
+#startButton:active, #startButton:hover,
+#createAccountButton:active, #createAccountButton:hover,
+#registerButton:active, #registerButton:hover,
+#cancelRegisterButton:active, #cancelRegisterButton:hover {
     top: 1px;
     background: #55D88B;
     outline: none;
@@ -91,25 +99,31 @@ div {
     box-shadow: none;
 }
 
-#startMenu h3 {
+#startMenu h3, #registerMenu h3 {
     padding-bottom: 0;
     margin-bottom: 0;
 }
 
-#startMenu ul {
+#startMenu ul, #registerMenu ul {
     margin: 10px;
     padding: 10px;
     margin-top: 0;
 }
 
-#startMenu .input-error {
+#startMenu .input-error, #registerMenu .input-error {
     color: red;
     opacity: 0;
     font-size : 12px;
 }
 
 #startMenuWrapper {
+    z-index: 3;
+    display: block;
+}
+
+#registerWrapper {
     z-index: 2;
+    display: none;
 }
 
 #gameAreaWrapper {

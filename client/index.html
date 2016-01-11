@@ -9,10 +9,26 @@
     <div id="startMenuWrapper">
       <div id="startMenu">
         <p>Raiders</p>
-        <input type="text" tabindex="0" autofocus placeholder="Enter your name here" id="playerNameInput" maxlength="25" />
+        <!--<form action="login" method="post">-->
+          <input type="text" name="username" tabindex="0" autofocus placeholder="Username" id="playerUsernameInput" maxlength="25" required/>
+          <input type="password" name="password" tabindex="0" autofocus placeholder="Password" id="playerPasswordInput" maxlength="25" required/>
+          <b class="input-error">Nick must be alphanumeric characters only!</b>
+          <br />
+          <!--<input type="submit" id="startButton" value="Login">-->
+          <button id="startButton">Login</button>
+        <!--</form>-->
+        <button id="createAccountButton">Create Account</button>
+      </div>
+    </div>
+    <div id="registerWrapper">
+      <div id="registerMenu">
+        <p>Raiders</p>
+        <input type="text" tabindex="0" autofocus placeholder="Username" id="regUsernameInput" maxlength="25" />
+        <input type="password" tabindex="0" autofocus placeholder="Password" id="regPasswordInput" maxlength="25" />
         <b class="input-error">Nick must be alphanumeric characters only!</b>
         <br />
-        <button id="startButton">Play</button>
+        <button id="registerButton">Register</button>
+        <button id="cancelRegisterButton">Cancel</button>
       </div>
     </div>
     <div id="gameAreaWrapper">
