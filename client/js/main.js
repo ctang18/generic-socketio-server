@@ -32,50 +32,19 @@ function startGame(){
   socket.emit('joined', player);  
 }
 
-
-
 window.onload = function() { 
   
-  var startBtn = document.getElementById('startButton');
   var createAccountBtn = document.getElementById('createAccountButton');
-  var registerBtn = document.getElementById('registerButton');
   var cancelRegisterBtn = document.getElementById('cancelRegisterButton');
-  //var nickErrorText = document.querySelector('#startMenu .input-error');
-  
-  /*if(!socket){
-    socket = io();
-    setupSocket(socket);
-  }*/
-
-  /*startBtn.onclick = function() {
-    //TODO Verify Account
-    console.log("login press");
-    var accountInfo = {
-      username : document.getElementById('playerUsernameInput').value,
-      password : document.getElementById('playerPasswordInput').value
-    };
-    socket.emit('login', accountInfo);
-  };*/
   
   createAccountBtn.onclick = function() {
-    console.log("create account");
     document.getElementById('loginMenuWrapper').style.display = 'none';
     document.getElementById('registerWrapper').style.display = 'block';
   };
   
   cancelRegisterBtn.onclick = function() {
-    console.log("cancel register");
     document.getElementById('loginMenuWrapper').style.display = 'block';
     document.getElementById('registerWrapper').style.display = 'none';
-  };
-  
-  registerBtn.onclick = function() {
-    //TODO Client-side validation
-    var accountInfo = {
-      username : document.getElementById('regUsernameInput').value,
-      password : document.getElementById('regPasswordInput').value
-    };
-    socket.emit('register', accountInfo);
   };
 };
 
@@ -85,40 +54,36 @@ $('#loginButton').click(function (e) {
     username: document.getElementById('playerUsernameInput').value,
     password: document.getElementById('playerPasswordInput').value
   }).done(function (result) {
-    //connect_socket(result.token);
-    //socket = io();
-    //setupSocket(socket);
     socket = io.connect('http://localhost:3000', {
       query: 'token=' + result.token,
       forceNew: true
     });
     setupSocket(socket);
-    startGame();
   });
 });
 
+$('#registerButton').click(function (e) {
+  e.preventDefault();
+  validateRegistration();
+  $.post('register', {
+    //TODO: Confirm passwords
+    username: document.getElementById('regUsernameInput').value,
+    password: document.getElementById('regPasswordInput').value
+  }).done(function (result) {
+    if(result.success){
+      document.getElementById('loginMenuWrapper').style.display = 'block';
+      document.getElementById('registerWrapper').style.display = 'none';
+    } else {
+      console.log('Register Fail: ' + result.err);
+    }
+  });
+});
+
+/* Helper Functions */
 function setupSocket(socket){
   socket.on('connect', function(data){
     console.log('connected');
     startGame();
-  });
-  
-  socket.on('register success', function(){
-    console.log('register success');
-    document.getElementById('loginMenuWrapper').style.display = 'block';
-    document.getElementById('registerWrapper').style.display = 'none';
-  });
-  
-  socket.on('register fail', function(msg){
-    $('#messages').append($('<li>').text("Register Failed: " + msg));
-  });
-  
-  socket.on('login success', function(data){
-    startGame();
-  });
-  
-  socket.on('login fail', function(msg){
-    $('#messages').append($('<li>').text("Login Failed: " + msg));
   });
   
   socket.on('chat message', function(msg){
@@ -139,6 +104,15 @@ function setupSocket(socket){
   });
 }
 
-function drawPlayers(){
+function validateRegistration(){
+  var username = $('#regUsernameInput').val();
+  var password = $('#regPasswordInput').val();
+  var confirm = $('#regConfirmInput').val();
   
+  if(password != confirm){
+    $('#registerError').html("Passwords must match");
+    $('#registerError').css("visibility", "visible");
+    console.log("passwords must match");
+    return false;
+  }
 }

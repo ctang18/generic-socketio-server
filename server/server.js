@@ -56,14 +56,33 @@ app.post('/login', function(req, res) {
   
   UserDB.findOne({'username' : account.username}, function (err, user) {
     if (err) { 
-      console.log('Login fail: ' +  err);
+      res.json({success: false, reason: err});
     } else {
       if(user.authenticate(account.password)){
         var token = jwt.sign(account, jwtSecret, { expiresIn: jwtExpire });
         res.json({token: token});
       } else {
-        console.log('Login fail');
+        res.json({success: false, reason: err});
       };
+    }
+  });
+});
+
+app.post('/register', function(req, res) {
+  
+  var account = {
+    username: req.body.username,
+    password: req.body.password
+  };
+  
+  console.log('Registering ' + account.username);
+  var newAccount = new UserDB(account);
+  newAccount.save(function (err, user) {
+    if (err) {
+      res.json({success: false, reason: err});
+      console.log('Register fail: ' + err);
+    } else {
+      res.json({success: true});
     }
   });
 });
@@ -77,9 +96,6 @@ var playerList = [];
 var sockets = {};
 
 /* Sockets */
-
-//TODO Use HTTPS requests for login / register
-//TODO Connect after login request completed successfully.
 io.use(socketioJwt.authorize({
   secret: jwtSecret,
   handshake: true
@@ -92,7 +108,7 @@ io.on('connection', function(socket){
     id: socket.id
   };
   
-  socket.on('register', function(account){
+  /*socket.on('register', function(account){
     console.log('Registering ' + account.username);
     var newAccount = new UserDB(account);
     newAccount.save(function (err, user) {
@@ -104,7 +120,7 @@ io.on('connection', function(socket){
         socket.emit('register success');
       }
     });
-    /*
+    
     UserDB.register(new UserDB({ username : account.username }), account.password, function(err, account) {
       if (err) {
         //TODO Send back errors
@@ -114,7 +130,7 @@ io.on('connection', function(socket){
         console.log('Register success');
         socket.emit('register success');
       }
-    });*/
+    });
     //TODO create player data
   });
   
@@ -135,7 +151,7 @@ io.on('connection', function(socket){
       //TODO return player data
       var data;
       socket.emit('login success', data);
-    });*/
+    });
     
     UserDB.findOne({'username' : account.username}, function (err, user) {
       if (err) { 
@@ -153,7 +169,7 @@ io.on('connection', function(socket){
     });
     console.log('finish login check');
     
-  });
+  });*/
   
   socket.on('joined', function(player){
     io.emit('player join', player.name);
@@ -175,8 +191,13 @@ io.on('connection', function(socket){
   });
 });
 
+/* Helper Functions */
 function sendUpdates(){
   io.emit('serverTellPlayerMove', playerList);
+}
+
+function checkUserExists(){
+  
 }
 
 setInterval(sendUpdates, 1000 / 40);
