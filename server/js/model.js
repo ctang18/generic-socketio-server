@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var passportLocalMongoose = require('passport-local-mongoose');
-var basicAuthMongoose = require('basic-auth-mongoose');
 var uriString = process.env.MONGOLAB_URI || 'mongodb://localhost/raiders'
 var connection = mongoose.createConnection(uriString);
 
@@ -23,10 +22,7 @@ var playerSchema = new Schema({
 });
 
 /* Users */
-
-//TODO repurpose passportLocalMongoose's more secure encryption
-//userSchema.plugin(passportLocalMongoose);
-userSchema.plugin(basicAuthMongoose);
+userSchema.plugin(passportLocalMongoose);
 var UserProvider = connection.model('User', userSchema);
 
 /* Player Characters */

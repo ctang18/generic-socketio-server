@@ -32,21 +32,18 @@ function startGame(){
   socket.emit('joined', player);  
 }
 
-window.onload = function() { 
-  
-  var createAccountBtn = document.getElementById('createAccountButton');
-  var cancelRegisterBtn = document.getElementById('cancelRegisterButton');
-  
-  createAccountBtn.onclick = function() {
-    document.getElementById('loginMenuWrapper').style.display = 'none';
-    document.getElementById('registerWrapper').style.display = 'block';
-  };
-  
-  cancelRegisterBtn.onclick = function() {
-    document.getElementById('loginMenuWrapper').style.display = 'block';
-    document.getElementById('registerWrapper').style.display = 'none';
-  };
-};
+/* Document */
+$('#createAccountButton').click(function (e) {
+  e.preventDefault();
+  document.getElementById('loginMenuWrapper').style.display = 'none';
+  document.getElementById('registerWrapper').style.display = 'block';
+});
+
+$('#cancelRegisterButton').click(function (e) {
+  e.preventDefault();
+  document.getElementById('loginMenuWrapper').style.display = 'block';
+  document.getElementById('registerWrapper').style.display = 'none';
+});
 
 $('#loginButton').click(function (e) {
   e.preventDefault();
@@ -58,11 +55,16 @@ $('#loginButton').click(function (e) {
       username: username,
       password: password
     }).done(function (result) {
-      socket = io.connect('http://localhost:3000', {
-        query: 'token=' + result.token,
-        forceNew: true
-      });
-      setupSocket(socket);
+      if(result.success){
+        socket = io.connect('http://localhost:3000', {
+          query: 'token=' + result.token,
+          forceNew: true
+        });
+        setupSocket(socket);
+      } else {
+        $('#loginError').html(result.err.message);
+        $('#loginError').css("visibility", "visible");
+      }
     });
   }
 });
@@ -82,7 +84,8 @@ $('#registerButton').click(function (e) {
         document.getElementById('loginMenuWrapper').style.display = 'block';
         document.getElementById('registerWrapper').style.display = 'none';
       } else {
-        console.log('Register Fail: ' + result.err);
+        $('#registerError').html(result.err.message);
+        $('#registerError').css("visibility", "visible");
       }
     });
   }
