@@ -10,6 +10,8 @@ var jwt = require('jsonwebtoken');
 var socketioJwt = require('socketio-jwt');
 var socketAuth = require('socketio-auth');
 var morgan = require('morgan');  
+var bodyParser = require('body-parser');
+
 
 var model = require('./js/model.js');
 var util = require('./js/util.js');
@@ -17,6 +19,8 @@ var util = require('./js/util.js');
 /* Configuration */
 app.use(express.static(__dirname + '/../client'));
 app.use(morgan('dev'));  
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 
 //app.use(passport.initialize());
@@ -39,20 +43,31 @@ passport.use(new LocalStrategy(function(username, password, done) {
 //passport.serializeUser(UserDB.serializeUser());
 //passport.deserializeUser(UserDB.deserializeUser());
 
+var jwtSecret = 'butts';
+var jwtExpire = 60*5;
+
 /* Router */
-app.post('login', function(req, res) {
-    var profile = {
-    first_name: 'John',
-    last_name: 'Doe',
-    email: 'john@doe.com',
-    id: 123
+app.post('/login', function(req, res) {
+
+  var account = {
+    username: req.body.username,
+    password: req.body.password
   };
-
-  // we are sending the profile in the token
-  var token = jwt.sign(profile, 'butts', { expiresInMinutes: 60*5 });
-
-  res.json({token: token});
+  
+  UserDB.findOne({'username' : account.username}, function (err, user) {
+    if (err) { 
+      console.log('Login fail: ' +  err);
+    } else {
+      if(user.authenticate(account.password)){
+        var token = jwt.sign(account, jwtSecret, { expiresIn: jwtExpire });
+        res.json({token: token});
+      } else {
+        console.log('Login fail');
+      };
+    }
+  });
 });
+
 app.get('/', function(req, res){
   res.sendfile('index.html');
 });
@@ -62,21 +77,13 @@ var playerList = [];
 var sockets = {};
 
 /* Sockets */
-//TODO setup secret key
 
-require('socketio-auth')(io, { 
-  authenticate: function (socket, data, callback) {
-    //get credentials sent by the client
-    var username = data.username;
-    var password = data.password;
-    
-    UserDB.findUser('User', {username:username}, function(err, user) {
-      //inform the callback of auth success/failure
-      if (err || !user) return callback(new Error("User not found"));
-      return callback(null, user.password == password);
-    })
-  }
-});
+//TODO Use HTTPS requests for login / register
+//TODO Connect after login request completed successfully.
+io.use(socketioJwt.authorize({
+  secret: jwtSecret,
+  handshake: true
+}));
 
 io.on('connection', function(socket){
   console.log('a user connected');

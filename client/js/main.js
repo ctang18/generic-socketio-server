@@ -12,7 +12,7 @@ var playerList = [];
 var playerRenders = [];
 
 function startGame(){
-  document.getElementById('startMenuWrapper').style.display = 'none';
+  document.getElementById('loginMenuWrapper').style.display = 'none';
   document.getElementById('gameAreaWrapper').style.display = 'block';
   
   player.name = "" + Math.round(Math.random() * 360);
@@ -32,6 +32,8 @@ function startGame(){
   socket.emit('joined', player);  
 }
 
+
+
 window.onload = function() { 
   
   var startBtn = document.getElementById('startButton');
@@ -40,12 +42,12 @@ window.onload = function() {
   var cancelRegisterBtn = document.getElementById('cancelRegisterButton');
   //var nickErrorText = document.querySelector('#startMenu .input-error');
   
-  if(!socket){
+  /*if(!socket){
     socket = io();
     setupSocket(socket);
-  }
+  }*/
 
-  startBtn.onclick = function() {
+  /*startBtn.onclick = function() {
     //TODO Verify Account
     console.log("login press");
     var accountInfo = {
@@ -53,17 +55,17 @@ window.onload = function() {
       password : document.getElementById('playerPasswordInput').value
     };
     socket.emit('login', accountInfo);
-  };
+  };*/
   
   createAccountBtn.onclick = function() {
     console.log("create account");
-    document.getElementById('startMenuWrapper').style.display = 'none';
+    document.getElementById('loginMenuWrapper').style.display = 'none';
     document.getElementById('registerWrapper').style.display = 'block';
   };
   
   cancelRegisterBtn.onclick = function() {
     console.log("cancel register");
-    document.getElementById('startMenuWrapper').style.display = 'block';
+    document.getElementById('loginMenuWrapper').style.display = 'block';
     document.getElementById('registerWrapper').style.display = 'none';
   };
   
@@ -77,10 +79,33 @@ window.onload = function() {
   };
 };
 
+$('#loginButton').click(function (e) {
+  e.preventDefault();
+  $.post('login', {
+    username: document.getElementById('playerUsernameInput').value,
+    password: document.getElementById('playerPasswordInput').value
+  }).done(function (result) {
+    //connect_socket(result.token);
+    //socket = io();
+    //setupSocket(socket);
+    socket = io.connect('http://localhost:3000', {
+      query: 'token=' + result.token,
+      forceNew: true
+    });
+    setupSocket(socket);
+    startGame();
+  });
+});
+
 function setupSocket(socket){
+  socket.on('connect', function(data){
+    console.log('connected');
+    startGame();
+  });
+  
   socket.on('register success', function(){
     console.log('register success');
-    document.getElementById('startMenuWrapper').style.display = 'block';
+    document.getElementById('loginMenuWrapper').style.display = 'block';
     document.getElementById('registerWrapper').style.display = 'none';
   });
   
