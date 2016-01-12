@@ -1,4 +1,4 @@
-Barebones Node.JS server that implments express, socket.io, JSON web tokens, and MongoDB.
+Generic Node.JS server that implments express, socket.io, and MongoDB. Complete with both client-side and server-side validation and JSON token authorization.
 
 ## Installation
 ```
