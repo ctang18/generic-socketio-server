@@ -50,33 +50,42 @@ window.onload = function() {
 
 $('#loginButton').click(function (e) {
   e.preventDefault();
-  $.post('login', {
-    username: document.getElementById('playerUsernameInput').value,
-    password: document.getElementById('playerPasswordInput').value
-  }).done(function (result) {
-    socket = io.connect('http://localhost:3000', {
-      query: 'token=' + result.token,
-      forceNew: true
+  var username = $('#playerUsernameInput').val();
+  var password = $('#playerPasswordInput').val();
+  
+  if(validateLogin(username, password)){
+    $.post('login', {
+      username: username,
+      password: password
+    }).done(function (result) {
+      socket = io.connect('http://localhost:3000', {
+        query: 'token=' + result.token,
+        forceNew: true
+      });
+      setupSocket(socket);
     });
-    setupSocket(socket);
-  });
+  }
 });
 
 $('#registerButton').click(function (e) {
+  var username = $('#regUsernameInput').val();
+  var password = $('#regPasswordInput').val();
+  var confirm = $('#regConfirmInput').val();
+  
   e.preventDefault();
-  validateRegistration();
-  $.post('register', {
-    //TODO: Confirm passwords
-    username: document.getElementById('regUsernameInput').value,
-    password: document.getElementById('regPasswordInput').value
-  }).done(function (result) {
-    if(result.success){
-      document.getElementById('loginMenuWrapper').style.display = 'block';
-      document.getElementById('registerWrapper').style.display = 'none';
-    } else {
-      console.log('Register Fail: ' + result.err);
-    }
-  });
+  if(validateRegistration(username, password, confirm)){
+    $.post('register', {
+      username: username,
+      password: password
+    }).done(function (result) {
+      if(result.success){
+        document.getElementById('loginMenuWrapper').style.display = 'block';
+        document.getElementById('registerWrapper').style.display = 'none';
+      } else {
+        console.log('Register Fail: ' + result.err);
+      }
+    });
+  }
 });
 
 /* Helper Functions */
@@ -104,15 +113,36 @@ function setupSocket(socket){
   });
 }
 
-function validateRegistration(){
-  var username = $('#regUsernameInput').val();
-  var password = $('#regPasswordInput').val();
-  var confirm = $('#regConfirmInput').val();
-  
-  if(password != confirm){
+function validateRegistration(username, password, confirm){ 
+  if(username.length < 4 || username.length > 20){
+    $('#registerError').html("Username must be between 4 and 20 characters");
+  } else if(password.length < 4 || password.length > 20) {
+    $('#registerError').html("Password must be between 4 and 20 characters");
+  } else if(password != confirm){
     $('#registerError').html("Passwords must match");
-    $('#registerError').css("visibility", "visible");
-    console.log("passwords must match");
-    return false;
+  } else if(!alphaNumeric(username) || !alphaNumeric(password)){
+    $('#registerError').html("Alphanumerical characters only");
+  } else {
+    return true;
   }
+  $('#registerError').css("visibility", "visible");
+  return false;
+}
+
+function validateLogin(username, password){
+  if(username.length < 4 || username.length > 20){
+    $('#loginError').html("Username must be between 4 and 20 characters");
+  } else if(password.length < 4 || password.length > 20) {
+    $('#loginError').html("Password must be between 4 and 20 characters");
+  } else if(!alphaNumeric(username) || !alphaNumeric(password)){
+    $('#loginError').html("Alphanumerical characters only");
+  } else {
+    return true;
+  }
+  $('#loginError').css("visibility", "visible");
+  return false;
+}
+
+function alphaNumeric(str){
+  return /[^a-zA-Z0-9]/.test(str) ? false : true;
 }

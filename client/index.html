@@ -1,30 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Raiders</title>
+    <title>Client</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="css/main.css" />
   </head>
   <body>
     <div id="loginMenuWrapper">
       <div id="loginMenu">
-        <p>Raiders</p>
+        <p>Client</p>
           <input type="text" tabindex="0" autofocus placeholder="Username" id="playerUsernameInput" maxlength="25" required/>
           <input type="password" tabindex="0" autofocus placeholder="Password" id="playerPasswordInput" maxlength="25" required/>
-          <b id="loginError">x</b>
-          <br />
+          <div id="loginError">x</div>
           <button id="loginButton">Login</button>
         <button id="createAccountButton">Create Account</button>
       </div>
     </div>
     <div id="registerWrapper">
       <div id="registerMenu">
-        <p>Raiders</p>
+        <p>Client</p>
         <input type="text" tabindex="0" autofocus placeholder="Username" id="regUsernameInput" maxlength="25" />
         <input type="password" tabindex="0" autofocus placeholder="Password" id="regPasswordInput" maxlength="25" />
-        <input type="password" tabindex="0" autofocus placeholder="Password" id="regConfirmInput" maxlength="25" />
-        <b id="registerError">x</b>
-        <br />
+        <input type="password" tabindex="0" autofocus placeholder="Confirm" id="regConfirmInput" maxlength="25" />
+        <div id="registerError">x</div>
         <button id="registerButton">Register</button>
         <button id="cancelRegisterButton">Cancel</button>
       </div>

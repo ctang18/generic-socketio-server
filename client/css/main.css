@@ -116,6 +116,7 @@ div {
   color: red;
   visibility: hidden;
   font-size : 12px;
+  text-align: center;
 }
 
 #loginMenuWrapper {
