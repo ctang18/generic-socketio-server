@@ -1,4 +1,4 @@
-Server for unnamed project built with express, socket.io, and mongoose on top of NodeJS.
+Barebones Node.JS server that implments express, socket.io, JSON web tokens, and MongoDB.
 
 ## Installation
 ```
@@ -10,4 +10,4 @@ npm install
 npm start
 ```
 
-The game will then be accessible at `http://localhost:3000`.
+The client will then be accessible at `http://localhost:3000`.
