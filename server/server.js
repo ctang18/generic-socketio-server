@@ -3,15 +3,10 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-//var passport = require('passport');
-//var LocalStrategy = require('passport-local').Strategy;
-//var CustomStrategy = require('passport-custom').Strategy
 var jwt = require('jsonwebtoken');
 var socketioJwt = require('socketio-jwt');
-//var socketAuth = require('socketio-auth');
 var morgan = require('morgan');  
 var bodyParser = require('body-parser');
-
 
 var model = require('./js/model.js');
 var util = require('./js/util.js');
@@ -19,8 +14,8 @@ var util = require('./js/util.js');
 /* Configuration */
 app.use(express.static(__dirname + '/../client'));
 app.use(morgan('dev'));  
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var UserDB = model.UserProvider;
 //TODO: Create configuration file
@@ -29,22 +24,34 @@ var jwtExpire = 60*5;
 
 /* Router */
 app.post('/login', function(req, res) {
-  UserDB({username: req.body.username}).authenticate(req.body.password, function(err, user, passErr){
-    if(err || passErr){
-      res.json({success: false, err: (err || passErr)});
+  validateAccount(req.body.username, req.body.password, function(err){
+    if(err){
+      res.json({success: false, reason: err});
     } else {
-      var token = jwt.sign(user, jwtSecret, { expiresIn: jwtExpire });
-      res.json({token: token});
+      UserDB({username: req.body.username}).authenticate(req.body.password, function(err, user, passErr){
+        if(err || passErr){
+          res.json({success: false, reason: (err || passErr)});
+        } else {
+          var token = jwt.sign(user, jwtSecret, { expiresIn: jwtExpire });
+          res.json({success: true, token: token});
+      }
+    });  
     }
   });
 });
 
 app.post('/register', function(req, res) {
-  UserDB.register(new UserDB({ username : req.body.username }), req.body.password, function(err, user){
+  validateAccount(req.body.username, req.body.password, function(err){
     if(err){
-      res.json({success: false, err: err});
+      res.json({success: false, reason: err});
     } else {
-      res.json({success: true});
+      UserDB.register(new UserDB({ username : req.body.username }), req.body.password, function(err, user){
+        if(err){
+          res.json({success: false, reason: err});
+        } else {
+          res.json({success: true});
+        }
+      });
     }
   });
 });
@@ -99,8 +106,20 @@ function checkUserExists(){
   
 }
 
-function validateAccount(username, password){
-  
+function validateAccount(username, password, cb){
+  if(username.length < 4 || username.length > 20){
+    return cb({message: "Username must be between 4 and 20 characters"});
+  } else if(password.length < 4 || password.length > 20) {
+    return cb({message: "Password must be between 4 and 20 characters"});
+  } else if(!alphaNumeric(username) || !alphaNumeric(password)){
+    return cb({message: "Alphanumerical characters only"});
+  } else {
+    return cb(null);
+  }
+}
+
+function alphaNumeric(str){
+  return /[^a-zA-Z0-9]/.test(str) ? false : true;
 }
 
 setInterval(sendUpdates, 1000 / 40);

@@ -62,7 +62,7 @@ $('#loginButton').click(function (e) {
         });
         setupSocket(socket);
       } else {
-        $('#loginError').html(result.err.message);
+        $('#loginError').html(result.reason.message);
         $('#loginError').css("visibility", "visible");
       }
     });
@@ -84,7 +84,7 @@ $('#registerButton').click(function (e) {
         document.getElementById('loginMenuWrapper').style.display = 'block';
         document.getElementById('registerWrapper').style.display = 'none';
       } else {
-        $('#registerError').html(result.err.message);
+        $('#registerError').html(result.reason.message);
         $('#registerError').css("visibility", "visible");
       }
     });

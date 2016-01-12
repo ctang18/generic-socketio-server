@@ -9,7 +9,6 @@ var Schema = mongoose.Schema
 /* Schemas */
 var userSchema = new Schema({
   email : String
-  //email : { type: String, required: true }
 });
 
 var playerSchema = new Schema({
