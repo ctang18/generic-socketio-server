@@ -1,5 +1,8 @@
 var socket;
 
+var minChar = 4;
+var maxChar = 20;
+
 /* Game Variables */
 var player = {
   id: -1,
@@ -117,13 +120,13 @@ function setupSocket(socket){
 }
 
 function validateRegistration(username, password, confirm){ 
-  if(username.length < 4 || username.length > 20){
-    $('#registerError').html("Username must be between 4 and 20 characters");
-  } else if(password.length < 4 || password.length > 20) {
-    $('#registerError').html("Password must be between 4 and 20 characters");
+  if(username.length < minChar || username.length > maxChar){
+    $('#registerError').html("Username must be between " + minChar + " and " + maxChar + " characters");
+  } else if(password.length < minChar || password.length > maxChar) {
+    $('#registerError').html("Password must be between " + minChar + " and " + maxChar + " characters");
   } else if(password != confirm){
     $('#registerError').html("Passwords must match");
-  } else if(!alphaNumeric(username) || !alphaNumeric(password)){
+  } else if(!alphaNumeric(username) || !validPassword(password)){
     $('#registerError').html("Alphanumerical characters only");
   } else {
     return true;
@@ -133,11 +136,11 @@ function validateRegistration(username, password, confirm){
 }
 
 function validateLogin(username, password){
-  if(username.length < 4 || username.length > 20){
-    $('#loginError').html("Username must be between 4 and 20 characters");
-  } else if(password.length < 4 || password.length > 20) {
-    $('#loginError').html("Password must be between 4 and 20 characters");
-  } else if(!alphaNumeric(username) || !alphaNumeric(password)){
+  if(username.length < minChar || username.length > maxChar){
+    $('#loginError').html("Username must be between " + minChar + " and " + maxChar + " characters");
+  } else if(password.length < minChar || password.length > maxChar) {
+    $('#loginError').html("Password must be between " + minChar + " and " + maxChar + " characters");
+  } else if(!alphaNumeric(username) || !validPassword(password)){
     $('#loginError').html("Alphanumerical characters only");
   } else {
     return true;
@@ -148,4 +151,8 @@ function validateLogin(username, password){
 
 function alphaNumeric(str){
   return /[^a-zA-Z0-9]/.test(str) ? false : true;
+}
+
+function validPassword(str){
+  return /^[a-zA-Z0-9!@#$%&*]+$/.test(str) ? true : false;
 }

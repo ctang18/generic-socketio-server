@@ -10,6 +10,7 @@ var bodyParser = require('body-parser');
 
 var model = require('./js/model.js');
 var util = require('./js/util.js');
+var c = require('./config.json');
 
 /* Configuration */
 app.use(express.static(__dirname + '/../client'));
@@ -18,9 +19,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var UserDB = model.UserProvider;
-//TODO: Create configuration file
-var jwtSecret = 'butts';
-var jwtExpire = 60*5;
+var port = process.env.PORT || c.port;
+var jwtSecret = c.jwtSecret;
+var jwtExpireIn = c.jwtExpireIn;
+var minChar = 4;
+var maxChar = 20;
 
 /* Router */
 app.post('/login', function(req, res) {
@@ -32,7 +35,7 @@ app.post('/login', function(req, res) {
         if(err || passErr){
           res.json({success: false, reason: (err || passErr)});
         } else {
-          var token = jwt.sign(user, jwtSecret, { expiresIn: jwtExpire });
+          var token = jwt.sign(user, jwtSecret, { expiresIn: jwtExpireIn });
           res.json({success: true, token: token});
       }
     });  
@@ -102,16 +105,12 @@ function sendUpdates(){
   io.emit('serverTellPlayerMove', playerList);
 }
 
-function checkUserExists(){
-  
-}
-
 function validateAccount(username, password, cb){
-  if(username.length < 4 || username.length > 20){
-    return cb({message: "Username must be between 4 and 20 characters"});
-  } else if(password.length < 4 || password.length > 20) {
-    return cb({message: "Password must be between 4 and 20 characters"});
-  } else if(!alphaNumeric(username) || !alphaNumeric(password)){
+  if(username.length < minChar || username.length > maxChar){
+    return cb({message: "Username must be between " + minChar + " and " + maxChar + " characters"});
+  } else if(password.length < minChar || password.length > maxChar) {
+    return cb({message: "Password must be between " + minChar + " and " + maxChar + " characters"});
+  } else if(!alphaNumeric(username) || !validPassword(password)){
     return cb({message: "Alphanumerical characters only"});
   } else {
     return cb(null);
@@ -122,10 +121,13 @@ function alphaNumeric(str){
   return /[^a-zA-Z0-9]/.test(str) ? false : true;
 }
 
+function validPassword(str){
+  return /^[a-zA-Z0-9!@#$%&*]+$/.test(str) ? true : false;
+}
+
 setInterval(sendUpdates, 1000 / 40);
 
 /* Application */
-//TODO: Configure Ports
-http.listen(3000, function(){
-  console.log('listening on localhost:3000');
+http.listen(port, function(){
+  console.log('listening on localhost:' + port);
 });
