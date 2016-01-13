@@ -36,7 +36,7 @@ app.post('/login', function(req, res) {
         if(err || passErr){
           res.json({success: false, reason: (err || passErr)});
         } else {
-          var token = jwt.sign(user, jwtSecret, { expiresIn: jwtExpireIn });
+          var token = jwt.sign({ 'username' : req.body.username }, jwtSecret, { expiresIn: jwtExpireIn });
           res.json({success: true, token: token});
       }
     });  
@@ -70,35 +70,34 @@ var playerList = [];
 var sockets = {};
 
 /* Sockets */
-io.use(socketioJwt.authorize({
-  secret: jwtSecret,
-  handshake: true
-}));
-
-io.on('connection', function(socket){
+io.on('connection', socketioJwt.authorize({
+    secret: jwtSecret,
+    timeout: 15000
+  })).on('authenticated', function(socket) {
   console.log('a user connected');
+  console.log('hello! ' + JSON.stringify(socket.decoded_token));
 
   var currentPlayer = {
-    id: socket.id
+	id: socket.id
   };
   
   socket.on('joined', function(player){
-    io.emit('player join', player.name);
-    console.log('[INFO] User ' + player.name + ' joined!');
-    currentPlayer = player;
-    playerList.push(currentPlayer);
+	io.emit('player join', player.name);
+	console.log('[INFO] User ' + player.name + ' joined!');
+	currentPlayer = player;
+	playerList.push(currentPlayer);
   });
   
   socket.on('disconnect', function(){
-    if (util.findIndex(playerList, currentPlayer.id) > -1){
-      playerList.splice(util.findIndex(playerList, currentPlayer.id), 1);
-      io.emit('player left', currentPlayer.name);
-      console.log('[INFO] User ' + currentPlayer.name + ' disconnected!');
-    }
+	if (util.findIndex(playerList, currentPlayer.id) > -1){
+	  playerList.splice(util.findIndex(playerList, currentPlayer.id), 1);
+	  io.emit('player left', currentPlayer.name);
+	  console.log('[INFO] User ' + currentPlayer.name + ' disconnected!');
+	}
   });
 
   socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+	io.emit('chat message', msg);
   });
 });
 

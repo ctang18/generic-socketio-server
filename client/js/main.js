@@ -1,5 +1,5 @@
 var socket;
-
+var jwt;
 var minChar = 4;
 var maxChar = 20;
 
@@ -59,11 +59,12 @@ $('#loginButton').click(function (e) {
       password: password
     }).done(function (result) {
       if(result.success){
-        socket = io.connect('http://localhost:3000', {
+        /*socket = io.connect('http://localhost:3000', {
           query: 'token=' + result.token,
           forceNew: true
-        });
-        setupSocket(socket);
+        });*/
+        jwt = result.token;
+        setupSocket(/*socket*/);
       } else {
         $('#loginError').html(result.reason.message);
         $('#loginError').css("visibility", "visible");
@@ -95,27 +96,31 @@ $('#registerButton').click(function (e) {
 });
 
 /* Helper Functions */
-function setupSocket(socket){
-  socket.on('connect', function(data){
+function setupSocket(){
+  socket = io.connect('http://localhost:3000');
+  socket.on('connect', function () {
     console.log('connected');
-    startGame();
-  });
-  
-  socket.on('chat message', function(msg){
-    $('#messages').append($('<li>').text(msg));
-  });
-  
-  socket.on('player join', function(playerName){
-    $('#messages').append($('<li>').text(playerName+ " has connected."));
-  });
-  
-  socket.on('player left', function(playerName){
-    $('#messages').append($('<li>').text(playerName + " has disconnected."));
-  });
-  
-  socket.on('serverTellPlayerMove', function(playerList){
-    this.playerList = playerList;
-    //Crafty(1).shift(1,1,0,0);
+    socket.on('authenticated', function () {
+      console.log('authenticated');
+      startGame();
+      socket.on('chat message', function(msg){
+        $('#messages').append($('<li>').text(msg));
+      });
+      
+      socket.on('player join', function(playerName){
+        $('#messages').append($('<li>').text(playerName+ " has connected."));
+      });
+      
+      socket.on('player left', function(playerName){
+        $('#messages').append($('<li>').text(playerName + " has disconnected."));
+      });
+      
+      socket.on('serverTellPlayerMove', function(playerList){
+        this.playerList = playerList;
+        //Crafty(1).shift(1,1,0,0);
+      });
+    })
+    .emit('authenticate', {token: jwt});
   });
 }
 

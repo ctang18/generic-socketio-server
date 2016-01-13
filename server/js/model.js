@@ -12,8 +12,7 @@ var userSchema = new Schema({
 });
 
 var playerSchema = new Schema({
-  userid   : ObjectId,
-  username : String,
+  username : { type: String, unique: true },
   position : {
     x : Number,
     y : Number
@@ -28,7 +27,27 @@ var UserProvider = connection.model('User', userSchema);
 var Player = connection.model('Player', playerSchema);
 var PlayerProvider = function(){};
 
+PlayerProvider.prototype.createPlayer = function(username, cb) {
+  var position = { x: Math.round(Math.random() * 599),
+    y: Math.round(Math.random() * 299) };
+  var color = 'yellow';
+  var player  = new Player({
+    username : username,
+    position : position,
+    color    : color
+  });
+  
+  player.save(function(err){
+    console.log(err);
+    cb(err);
+  });
+};
 
+PlayerProvider.prototype.getPlayer = function(username, cb) {
+	Player.find({ 'username': username }).exec(function(err, player) {
+		cb(err, player);
+	});
+};
 
 exports.UserProvider = UserProvider;
 exports.PlayerProvider = PlayerProvider;
