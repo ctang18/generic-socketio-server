@@ -19,6 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var UserDB = model.UserProvider;
+var PlayerDB = model.PlayerProvider;
 var port = process.env.PORT || c.port;
 var jwtSecret = c.jwtSecret;
 var jwtExpireIn = c.jwtExpireIn;
@@ -52,6 +53,7 @@ app.post('/register', function(req, res) {
         if(err){
           res.json({success: false, reason: err});
         } else {
+          //Create Account Information
           res.json({success: true});
         }
       });

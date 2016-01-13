@@ -25,7 +25,10 @@ userSchema.plugin(passportLocalMongoose);
 var UserProvider = connection.model('User', userSchema);
 
 /* Player Characters */
+var Player = connection.model('Player', playerSchema);
 var PlayerProvider = function(){};
+
+
 
 exports.UserProvider = UserProvider;
 exports.PlayerProvider = PlayerProvider;
