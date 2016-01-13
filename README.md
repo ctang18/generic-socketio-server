@@ -4,6 +4,7 @@ Generic Node.JS server that implments express, socket.io, and MongoDB. Complete 
 ```
 npm install
 ```
+Configure /server/config.json to your liking.
 
 ## Running the Server
 ```
