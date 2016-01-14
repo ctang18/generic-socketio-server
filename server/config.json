@@ -1,5 +1,6 @@
 {
   "port": 3000,
   "jwtSecret": "thisisthejsonsecretkey",
-  "jwtExpireIn": 360
+  "jwtExpireIn": 360,
+  "jwtAuthTime": 15000
 }

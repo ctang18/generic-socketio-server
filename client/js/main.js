@@ -2,6 +2,8 @@ var socket;
 var jwt;
 var minChar = 4;
 var maxChar = 20;
+//Keystroke Buffer
+var keys = [];
 
 /* Game Variables */
 var player = {
@@ -26,8 +28,13 @@ function startGame(){
     .text(player.username)
     .textFont({ size: '20px' })
     .fourway(50);
-
-  socket.emit('joined', player);  
+    
+  document.addEventListener("keydown", keydown, false);
+  document.addEventListener("keyup", keyup, false);
+  
+  socket.emit('joined', player); 
+  
+  setInterval(update, 1000/24); 
 }
 
 /* Document */
@@ -152,4 +159,33 @@ function alphaNumeric(str){
 
 function validPassword(str){
   return /^[a-zA-Z0-9!@#$%&*]+$/.test(str) ? true : false;
+}
+
+function keydown(e){
+    keys[e.keyCode] = true;
+}
+
+function keyup(e){
+    delete keys[e.keyCode];
+}
+
+function update(){
+  var sendKey = new Array();
+  
+  if (38 in keys) { // Player holding up
+    sendKey.push('up');
+  }
+  if (40 in keys) { // Player holding down
+    sendKey.push('down');
+  }
+  if (37 in keys) { // Player holding left
+    sendKey.push('left');
+  }
+  if (39 in keys) { // Player holding right
+    sendKey.push('right');
+  }
+  
+  socket.emit('client move', {
+      keys: sendKey
+  });
 }

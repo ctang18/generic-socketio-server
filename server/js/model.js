@@ -58,5 +58,9 @@ PlayerProvider.prototype.getPlayer = function(username, cb) {
 	});
 };
 
+PlayerProvider.prototype.updatePosition = function(username, deltaX, deltaY, cb) {
+  Player.update({ 'username' : username }, { $inc : { 'position.x' : deltaX, 'position.y' : deltaY }}, cb);
+};
+
 exports.UserProvider = UserProvider;
 exports.PlayerProvider = PlayerProvider;
