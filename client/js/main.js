@@ -17,21 +17,16 @@ var playerRenders = [];
 function startGame(){
   document.getElementById('loginMenuWrapper').style.display = 'none';
   document.getElementById('gameAreaWrapper').style.display = 'block';
-  
-  player.name = "" + Math.round(Math.random() * 360);
 
   Crafty.init(600, 300, document.getElementById('game'));
   Crafty.background('rgb(127,127,127)');
   var playerRender = Crafty.e('2D, Canvas, Color, Text, Fourway')
-    .attr({x: player.x, y: player.y, w:50, h:50})
-    .color('yellow')
-    .text(player.name)
+    .attr({x: player.position.x, y: player.position.y, w:50, h:50})
+    .color(player.color)
+    .text(player.username)
     .textFont({ size: '20px' })
     .fourway(50);
 
-  console.log(playerRender.getId());
-  playerRender.id = 12;
-  console.log(playerRender.getId());
   socket.emit('joined', player);  
 }
 
@@ -59,12 +54,8 @@ $('#loginButton').click(function (e) {
       password: password
     }).done(function (result) {
       if(result.success){
-        /*socket = io.connect('http://localhost:3000', {
-          query: 'token=' + result.token,
-          forceNew: true
-        });*/
         jwt = result.token;
-        setupSocket(/*socket*/);
+        setupSocket();
       } else {
         $('#loginError').html(result.reason.message);
         $('#loginError').css("visibility", "visible");
@@ -99,10 +90,11 @@ $('#registerButton').click(function (e) {
 function setupSocket(){
   socket = io.connect('http://localhost:3000');
   socket.on('connect', function () {
-    console.log('connected');
-    socket.on('authenticated', function () {
-      console.log('authenticated');
-      startGame();
+    socket.on('authenticated', function() {
+      socket.on('player data', function(data){
+        player = data;
+        startGame();  
+      });
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
       });

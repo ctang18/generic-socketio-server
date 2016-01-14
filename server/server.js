@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var UserDB = model.UserProvider;
-var PlayerDB = model.PlayerProvider;
+var PlayerDB = new model.PlayerProvider;
 var port = process.env.PORT || c.port;
 var jwtSecret = c.jwtSecret;
 var jwtExpireIn = c.jwtExpireIn;
@@ -54,7 +54,15 @@ app.post('/register', function(req, res) {
           res.json({success: false, reason: err});
         } else {
           //Create Account Information
-          res.json({success: true});
+          //TODO: Roll own Mongoose plugin where on UserDB.register player data is created as well
+          //Situation may arise that a user is created but not player
+          PlayerDB.createPlayer(req.body.username, function(err, user){
+            if(err){
+              res.json({success: false, reason: err});
+            } else {
+              res.json({success: true});
+            }
+          });
         }
       });
     }
@@ -75,15 +83,23 @@ io.on('connection', socketioJwt.authorize({
     timeout: 15000
   })).on('authenticated', function(socket) {
   console.log('a user connected');
-  console.log('hello! ' + JSON.stringify(socket.decoded_token));
-
-  var currentPlayer = {
-	id: socket.id
-  };
+  console.log('hello! ' + JSON.stringify(socket.decoded_token.username));
+  
+  var currentPlayer;
+  
+  PlayerDB.getPlayer(socket.decoded_token.username, function(err, player){
+    if(err){
+      console.log("Error finding player data: " + err);
+    } else {
+      socket.emit('player data', player);
+      currentPlayer = player;
+      currentPlayer.id = socket.id; 
+    }
+  });
   
   socket.on('joined', function(player){
-	io.emit('player join', player.name);
-	console.log('[INFO] User ' + player.name + ' joined!');
+	io.emit('player join', player.username);
+	console.log('[INFO] User ' + player.username + ' joined!');
 	currentPlayer = player;
 	playerList.push(currentPlayer);
   });
@@ -92,7 +108,7 @@ io.on('connection', socketioJwt.authorize({
 	if (util.findIndex(playerList, currentPlayer.id) > -1){
 	  playerList.splice(util.findIndex(playerList, currentPlayer.id), 1);
 	  io.emit('player left', currentPlayer.name);
-	  console.log('[INFO] User ' + currentPlayer.name + ' disconnected!');
+	  console.log('[INFO] User ' + currentPlayer.username + ' disconnected!');
 	}
   });
 

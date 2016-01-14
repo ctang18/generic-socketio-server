@@ -16,7 +16,8 @@ var playerSchema = new Schema({
   position : {
     x : Number,
     y : Number
-  }
+  },
+  color : String
 });
 
 /* Users */
@@ -38,14 +39,22 @@ PlayerProvider.prototype.createPlayer = function(username, cb) {
   });
   
   player.save(function(err){
-    console.log(err);
-    cb(err);
+    if(err){
+      cb(err);
+    } else {
+      cb(null);
+    }
   });
 };
 
 PlayerProvider.prototype.getPlayer = function(username, cb) {
-	Player.find({ 'username': username }).exec(function(err, player) {
-		cb(err, player);
+	Player.findOne({ 'username': username }).exec(function(err, player) {
+    if(err){
+      cb(err);
+    } else {
+      console.log('found player: ' + player);
+      cb(null, player);
+    }
 	});
 };
 
