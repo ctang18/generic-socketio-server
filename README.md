@@ -1,4 +1,7 @@
-Generic Node.JS server that implments express, socket.io, and MongoDB. Complete with both client-side and server-side validation and JSON token authorization. Intended for standalone and embeded web clients.
+Generic Node.JS server that implments express, socket.io, and MongoDB. Complete with both client-side and server-side validation and JSON token authorization. Intended for stand-alone or embeded web clients.
+
+## To Do
+- Complete demo for display purposes
 
 ## Installation
 ```
